@@ -1,0 +1,16 @@
+\begin{tabular}{lrrr}
+\toprule
+& Pairs & Agree on error & Excess over chance \\
+\midrule
+Same pre-training lineage & 10 & 42.0 & +10.3 \\
+Different lineage & 26 & 43.9 & +11.6 \\
+\midrule
+\multicolumn{4}{l}{\emph{Accuracy with a shared-error channel switched on}} \\
+\quad Greedy answers, no lure & -- & 72.3 & \\
+\quad\quad + lineage lure & -- & 72.3 & $\pm$0.00~(identical) \\
+\quad\quad + pool lure & -- & 72.3 & -0.05~(-0.65) \\
+\quad With repeated sampling, no lure & -- & 76.9 & \\
+\quad\quad + lineage lure & -- & 76.2 & -0.63~(-5.68) \\
+\quad\quad + pool lure & -- & 76.4 & -0.42~(-1.59) \\
+\bottomrule
+\end{tabular}

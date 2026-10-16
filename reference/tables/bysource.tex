@@ -1,0 +1,15 @@
+\begin{tabular}{lrrrrr}
+\toprule
+Method & MMLU & GSM8K & ARC-C & HellaSwag & Overall \\
+\midrule
+Best single expert & 72.6 & 59.8 & 80.2 & 73.7 & 75.0 \\
+\quad + self-consistency on GSM8K & 72.6 & 64.7 & 80.2 & 73.7 & 75.3 \\
+Majority vote & 65.2 & 71.5 & 67.5 & 55.8 & 63.0 \\
+Equal-weight pool & 68.8 & 78.3 & 75.4 & 67.1 & 71.4 \\
+MoRE + repeated sampling & 72.5 & 79.8 & 80.2 & 73.4 & 76.4 \\
+Supervised linear fusion & 74.3 & 80.2 & 79.7 & 72.7 & 76.2 \\
+\textbf{Jury (ours) + repeated sampling} & 74.8 & 79.8 & 80.1 & 73.9 & 76.9 \\
+\midrule
+Questions & 240 & 120 & 600 & 600 & 1560 \\
+\bottomrule
+\end{tabular}

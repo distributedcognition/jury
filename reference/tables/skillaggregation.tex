@@ -1,0 +1,23 @@
+\begin{tabular}{lllrr}
+\toprule
+Method & Labels & Input & Accuracy & $\Delta$ vs.\ jury~[95\% CI] \\
+\midrule
+Majority vote & no & greedy & 62.3 $\pm$ 1.8 & +14.6$^{*}$~[+12.4, +16.9] \\
+Inverse Surprising Popularity (ISP) & no & greedy & 68.9 $\pm$ 1.7 & +7.9$^{*}$~[+6.1, +9.7] \\
+Optimal Weight, accuracies learned (OW-L) & no & greedy & 71.3 $\pm$ 1.7 & +5.3$^{*}$~[+3.8, +6.9] \\
+Optimal Weight, ISP pseudo-labels (OW-I) & no & greedy & 71.6 $\pm$ 1.6 & +5.2$^{*}$~[+3.6, +6.7] \\
+Equal-weight pool & no & distributions & 70.8 $\pm$ 1.9 & +5.9$^{*}$~[+4.4, +7.5] \\
+\midrule
+SkillAggregation~\cite{sun-etal-2025-skillaggregation} & no & greedy & 66.8 $\pm$ 1.8 & +10.2$^{*}$~[+8.2, +12.2] \\
+\quad + answer distributions & no & distributions & 73.2 $\pm$ 1.9 & +3.5$^{*}$~[+2.2, +4.8] \\
+\quad\quad + development set & 250 & distributions & 72.9 $\pm$ 1.7 & +3.7$^{*}$~[+2.4, +5.0] \\
+\quad\quad + best observed epoch and $\lambda$ (test oracle) & test & distributions & 73.5 $\pm$ 1.9 & +3.1 \\
+SkillAggregation-X~\cite{sun-etal-2025-skillaggregation} & no & distributions & 49.6 $\pm$ 1.8 & +26.6$^{*}$~[+24.0, +29.3] \\
+\quad + development set & 250 & distributions & 73.2 $\pm$ 1.3 & +3.4$^{*}$~[+2.1, +4.8] \\
+\quad + best observed epoch and $\lambda$ (test oracle) & test & distributions & 74.0 $\pm$ 1.3 & +2.7 \\
+\midrule
+Supervised linear fusion & yes & distributions & 75.9 $\pm$ 1.4 & +0.7$^{*}$~[+0.2, +1.3] \\
+\textbf{Jury (ours), greedy answers} & \textbf{no} & greedy & 72.4 $\pm$ 1.1 & +4.3$^{*}$~[+3.0, +5.7] \\
+\textbf{\quad + repeated sampling} & \textbf{no} & distributions & 76.6 $\pm$ 1.4 &  \\
+\bottomrule
+\end{tabular}

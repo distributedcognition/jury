@@ -1,0 +1,22 @@
+\begin{tabular}{lrrrr}
+\toprule
+Start & Same solution & $\Delta$ log-lik.\ of the others & \multicolumn{2}{c}{Test accuracy (\%)} \\
+ & as default & (nats) & min & max \\
+\midrule
+\multicolumn{5}{l}{\emph{Sampled distributions, $\alpha = 8$}} \\
+Constant $0.6$ (default) & 10/10 & -- & 75.0 & 79.5 \\
+Constant $0.3$ & 10/10 & -- & 75.0 & 79.5 \\
+Constant $0.5$ & 10/10 & -- & 75.0 & 79.5 \\
+Constant $0.9$ & 10/10 & -- & 75.0 & 79.5 \\
+Plurality agreement & 10/10 & -- & 75.0 & 79.5 \\
+Random, $20$ draws & 197/200 & $-9{,}568$ to $-9{,}889$ & 8.5 & 79.5 \\
+\midrule
+\multicolumn{5}{l}{\emph{Greedy answers, $\alpha = 1$}} \\
+Constant $0.6$ (default) & 10/10 & -- & 71.3 & 74.5 \\
+Constant $0.3$ & 0/10 & $+33$ to $+114$ & 7.6 & 9.2 \\
+Constant $0.5$ & 10/10 & -- & 71.3 & 74.5 \\
+Constant $0.9$ & 10/10 & -- & 71.3 & 74.5 \\
+Plurality agreement & 10/10 & -- & 71.3 & 74.5 \\
+Random, $20$ draws & 144/200 & $+33$ to $+114$ & 7.6 & 74.5 \\
+\bottomrule
+\end{tabular}

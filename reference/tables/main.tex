@@ -1,0 +1,26 @@
+\begin{tabular}{>{\raggedright\arraybackslash}p{5.2cm}cccrrr}
+\toprule
+Method & Labels & Params (B) & Accuracy & Plurality & Minority & $\Delta$ vs.\ jury~[95\% CI] \\
+\midrule
+Best single expert & -- & -- & 75.0 $\pm$ 1.0 & -- & -- & +2.0$^{*}$~[+0.5, +3.6] \\
+\quad + self-consistency on GSM8K & -- & -- & 75.3 $\pm$ 1.1 & -- & -- & +1.6$^{*}$~[+0.0, +3.1] \\
+\midrule
+Majority vote~\cite{li2024moreagents} & no & 14.4 & 63.0 $\pm$ 1.6 & 100.0 & 6.2 & +14.1$^{*}$~[+12.0, +16.3] \\
+Inverse Surprising Popularity~\cite{prelec2017surprising,beyondmajority2025} & no & 14.4 & 69.1 $\pm$ 1.6 & 98.5 & 27.4 & +7.9$^{*}$~[+6.2, +9.6] \\
+Smoothie-Global~\cite{guha2024smoothie} & no & 1.5 & 66.3 $\pm$ 1.3 & 85.3 & 43.1 & +10.5$^{*}$~[+8.6, +12.4] \\
+Smoothie-Local~\cite{guha2024smoothie} & no & 2.0 & 64.2 $\pm$ 1.6 & 83.4 & 40.3 & +12.7$^{*}$~[+11.1, +14.4] \\
+Optimal Weight~\cite{nitzan1982optimal,beyondmajority2025} & yes & 14.4 & 73.0 $\pm$ 1.4 & 95.9 & 43.9 & +3.9$^{*}$~[+2.7, +5.2] \\
+LLM-TOPLA~\cite{tekin2024topla} & yes & 4.5 & 73.9 $\pm$ 1.5 & 89.3 & 58.5 & +2.9$^{*}$~[+1.4, +4.5] \\
+MoRE~\cite{si2023more} & yes & 14.4 & 74.6 $\pm$ 1.2 & 93.2 & 53.4 & +2.4$^{*}$~[+1.4, +3.6] \\
+MoRE + repeated sampling~\cite{si2023more} & yes & 22.2 & 76.4 $\pm$ 1.3 & 93.3 & 58.5 & +0.5~[-0.4, +1.5] \\
+Equal-weight pool~\cite{stone1961opinion} & no & 22.2 & 71.4 $\pm$ 1.8 & 96.8 & 37.2 & +5.5$^{*}$~[+4.1, +7.0] \\
+Supervised linear fusion~\cite{stone1961opinion,beyondmajority2025} & yes & 22.2 & 76.2 $\pm$ 1.4 & 95.6 & 53.5 & +0.6$^{*}$~[+0.1, +1.2] \\
+\midrule
+Answer scoring, discriminative & yes & 14.4 & 76.2 $\pm$ 1.3 & 93.1 & 58.7 & +0.7~[-0.4, +1.9] \\
+\quad + repeated sampling & yes & 22.2 & 76.7 $\pm$ 1.1 & 92.9 & 60.3 & +0.1~[-1.0, +1.2] \\
+\textbf{Jury (ours), greedy answers} & \textbf{no} & 14.4 & 72.3 $\pm$ 1.1 & 94.0 & 45.3 & +4.6$^{*}$~[+3.3, +5.9] \\
+\textbf{\quad + repeated sampling} & \textbf{no} & 22.2 & 76.9 $\pm$ 1.3 & 95.7 & 55.5 &  \\
+\midrule
+Oracle & -- & -- & 94.3 $\pm$ 0.5 & -- & -- & \\
+\bottomrule
+\end{tabular}

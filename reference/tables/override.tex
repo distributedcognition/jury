@@ -1,0 +1,26 @@
+\begin{tabular}{lrrrr}
+\toprule
+$\tau$ & Override rate & Accuracy & Plurality & Minority \\
+\midrule
+\multicolumn{5}{l}{\emph{Jury score, with repeated sampling}} \\
+\quad $0$ (trust the jury) & 23.4 & 76.9 & 95.7 & 55.5 \\
+\quad 0.1 & 23.3 & 76.9 & 95.8 & 55.5 \\
+\quad 0.2 & 23.3 & 76.9 & 95.8 & 55.5 \\
+\quad 0.3 & 23.2 & 76.9 & 95.8 & 55.4 \\
+\quad 0.5 & 22.9 & 76.9 & 96.0 & 55.2 \\
+\quad 0.7 & 22.2 & 76.8 & 96.1 & 54.6 \\
+\midrule
+\multicolumn{5}{l}{\emph{discriminative scorer, greedy answers}} \\
+\quad 0.00 & 28.8 & 76.2 & 93.1 & 58.7 \\
+\quad 0.12 & 25.5 & 76.1 & 94.7 & 55.4 \\
+\quad 0.24 & 22.2 & 75.6 & 95.8 & 51.6 \\
+\quad 0.36 & 18.5 & 74.6 & 97.1 & 46.3 \\
+\quad $\infty$ (consensus) & 0.0 & 63.0 & 100.0 & 6.2 \\
+\multicolumn{5}{l}{\emph{discriminative scorer, with repeated sampling}} \\
+\quad 0.00 & 29.3 & 76.7 & 92.9 & 60.3 \\
+\quad 0.12 & 25.8 & 76.6 & 94.6 & 57.0 \\
+\quad 0.24 & 22.6 & 76.1 & 96.0 & 53.0 \\
+\quad 0.36 & 19.5 & 75.4 & 97.1 & 48.8 \\
+\quad $\infty$ (consensus) & 0.0 & 63.0 & 100.0 & 6.2 \\
+\bottomrule
+\end{tabular}

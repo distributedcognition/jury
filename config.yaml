@@ -1,0 +1,227 @@
+# ============================================================================
+# Configuration for the Mixture-of-Experts LLM router benchmark
+# ============================================================================
+seed: 42
+device: auto            # auto | cpu | mps | cuda
+
+# Multi-task benchmark: two domains with COMPLEMENTARY expert strengths.
+#   mmlu  -> knowledge/humanities multiple choice  (general model wins)
+#   gsm8k -> grade-school math word problems        (math model wins)
+# No single small LLM is best at both, so a router that sends each question to
+# the right specialist can beat every expert alone.
+dataset:
+  train_frac: 0.5         # fraction used to TRAIN the router (rest = held-out benchmark)
+  tasks:
+    mmlu:
+      subjects:
+        - world_religions
+        - professional_law
+        - high_school_biology
+        - prehistory
+        - marketing
+        - high_school_geography
+      max_per_subject: 40
+    gsm8k:
+      max_examples: 120
+    # Two more binary-scored multiple-choice sets, chosen because they are scored
+    # 0/1 and share the four-option shape the benchmark's prompt and scorer
+    # already assume.
+    arc:
+      max_examples: 600
+    hellaswag:
+      max_examples: 600
+
+# The "experts": small instruction-tuned LLMs. All non-gated -> run out of the box.
+#
+# The pool is deliberately DIVERSE along three axes, because the router can only
+# exploit disagreement that exists in the pool:
+#   * size      0.5B -> 3B, so a cheap tier can absorb the easy questions;
+#   * domain    general / math / code / multilingual;
+#   * family    Qwen, OLMo-2 (AI2) and Granite (IBM) are pretrained on different
+#               corpora, so their mistakes are far less correlated than models
+#               from a single family.
+# `chat_template_kwargs` is forwarded to the tokenizer's chat template (used to
+# switch Qwen3 out of thinking mode, which our single-forward MC protocol and the
+# 256-token math budget cannot accommodate).
+experts:
+  - id: qwen0.5b
+    model: Qwen/Qwen2.5-0.5B-Instruct
+    params_b: 0.5
+  - id: qwen3-0.6b               # strong-and-cheap tier: offload the easy questions
+    model: Qwen/Qwen3-0.6B
+    params_b: 0.75               # 0.6B non-embedding, 0.75B total
+    chat_template_kwargs:
+      enable_thinking: false
+  - id: qwen1.5b
+    model: Qwen/Qwen2.5-1.5B-Instruct
+    params_b: 1.5
+  - id: qwen-math
+    model: Qwen/Qwen2.5-Math-1.5B-Instruct
+    params_b: 1.5
+  - id: qwen-coder1.5b           # domain expert: code (reasons about math procedurally)
+    model: Qwen/Qwen2.5-Coder-1.5B-Instruct
+    params_b: 1.5
+  - id: olmo2-1b                 # different family/corpus (AI2): decorrelated errors
+    model: allenai/OLMo-2-0425-1B-Instruct
+    params_b: 1.5
+  - id: eurollm1.7b              # domain expert: multilingual (EU languages)
+    model: utter-project/EuroLLM-1.7B-Instruct
+    params_b: 1.7
+  - id: granite2b                # different family (IBM): second strong mid-tier
+    model: ibm-granite/granite-3.3-2b-instruct
+    params_b: 2.5
+  - id: qwen3b
+    model: Qwen/Qwen2.5-3B-Instruct
+    params_b: 3.0
+
+generation:
+  max_new_tokens: 256      # for numeric (gsm8k) chain-of-thought; mc ignores it
+  batch_size: 16           # multiple-choice logprob scoring (cheap, single forward)
+  batch_size_numeric: 4    # math generation holds a KV-cache -> keep small on MPS
+
+fugu_rollouts:
+  samples: 8               # repeated worker rewards used by Fugu's soft target distribution
+  temperature: 0.7
+  top_p: 0.95
+  batch_size_mc: 32
+  batch_size_numeric: 4
+
+router:
+  embedding_model: sentence-transformers/all-MiniLM-L6-v2
+  type: blend             # blend | knn | multiclass | logreg | mlp
+  k: 30                   # knn: neighbours used to estimate regional expert accuracy
+  k_grid: [10, 20, 30, 50, 80]   # blend: candidate k tuned on internal validation
+  blend_C: [1.0, 0.3]     # blend: logistic gates ensembled with the kNN estimate
+  C: 1.0                  # logreg/multiclass L2 regularisation (smaller = stronger)
+  hidden: 128             # mlp only
+  epochs: 300             # mlp only (early-stopped on internal val split)
+  weight_decay: 0.001     # mlp only
+  lr: 0.001               # mlp only
+  cost_lambda: 0.0        # >0 -> penalise larger experts in the score, then argmax
+  cost_margin: 0.0        # cost-aware tie-break: among experts within `margin` of the best
+                          # predicted P(correct), pick the cheapest. Re-validated on the
+                          # diversified pool over 10 splits -- it is no longer free here:
+                          #   0.00 -> 70.2%  2.47B     0.02 -> 69.4%  2.33B (-0.8 pts)
+                          #   0.05 -> 68.1%  2.05B
+                          # (it was free on the old all-Qwen pool, where no strong cheap
+                          # expert existed to win the ties). Raise it only to buy compute.
+
+# Per-experiment hyperparameters (used by router_lab/techniques/<name>).
+experiments:
+  gate: {}                # uses the `router` block above
+  gnn:                    # graph neural network over the question-similarity graph
+    k: 10                 # neighbours per node in the graph
+    hidden: 64
+    epochs: 300
+    lr: 0.01
+    weight_decay: 0.0005
+  bandit:                 # kernelized LinUCB contextual bandit
+    alpha: 0.3            # exploration bonus (inert under full-info eval; see package doc)
+    ridge: 1.0
+    n_clusters_grid: [8, 16, 32]   # RBF prototype counts, tuned on internal val
+    gamma_grid: [2.0, 5.0, 10.0]   # RBF width, tuned on internal val
+  cascade:                # cost-aware cascade with escalation
+    k: 30
+    cost_weight: 0.05     # beta: accuracy points traded per B of avg compute (tunes tau)
+    tau_grid: [0.40, 0.45, 0.50, 0.55, 0.60, 0.65, 0.70]
+  ensemble:               # weighted-vote output fusion
+    k: 30
+  aggregator:             # post-hoc answer selection over the agreement pattern
+    k: 15                 # neighbours for the regional-reliability feature
+    C: 0.5                # inverse L2 strength of the candidate scorer
+    use_rollouts: false   # true -> also score the repeated Fugu samples (n_samples x compute)
+  jury:                   # label-free generative answer selection (Dawid-Skene over answers)
+    lure: none            # none | family | pool -- shared-error channel; measured to be inert
+    use_rollouts: false   # true -> soft emissions from the repeated Fugu samples
+    alpha: n              # evidence weight per expert: n = multinomial weight of the n samples (8 here); 1 = one witness, one testimony
+    max_iter: 200         # EM iterations
+    tol: 1.0e-7           # stop when no parameter moves by more than this
+  reinforce:              # policy-gradient router (single-step RL)
+    hidden: 64
+    epochs: 600
+    lr: 0.01
+    n_clusters: 16         # RBF feature prototypes (regional representation)
+    gamma: 10.0
+    reward_cost_weight: 0.0    # lambda: >0 trades accuracy for cheaper experts
+  routellm:               # RouteLLM SW-ranking (Ong et al., ICLR 2025, arXiv:2406.18665)
+    gamma: 10.0           # omega' = gamma^(1 + cos(q, q')); the paper's default
+    reg_grid: [1.0, 0.3, 0.1, 0.03, 0.01, 0.003]  # L2 on the BT coefficients, tuned on an
+                          # internal val split (ours, not the paper's: derived labels make
+                          # the BT likelihood separable without it). Set `reg` and drop
+                          # `reg_grid` to pin it instead.
+    folds: 5              # out-of-fold splits used to tune `reg` and calibrate `alpha`
+    newton_iters: 8       # batched Newton steps for the per-query BT fit
+    mode: all             # all -> argmax over M arms | binary -> the paper's strong/weak
+    # binary mode only; defaults to (largest, smallest) expert when unset
+    strong: qwen3b
+    weak: olmo2-1b
+    target_strong_frac: 0.5   # calibrate alpha to this fraction of strong calls (null -> use `alpha`)
+    alpha: 0.5
+  rl_cascade:             # sequential RL policy (learned cascade)
+    hidden: 64
+    epochs: 400
+    lr: 0.01
+    k: 30
+    reward_cost_weight: 0.15   # lambda: penalty per fraction of total compute spent
+  thompson:               # Bayesian linear bandit (Thompson sampling)
+    n_clusters: 16
+    gamma: 10.0
+    noise_var: 0.25
+    prior_var: 1.0
+    posterior_samples: 20
+  qlearning:              # value-based (DQN-style) router
+    hidden: 128
+    epochs: 500
+    lr: 0.005
+    n_clusters: 16
+    gamma: 10.0
+    reward_cost_weight: 0.0
+  soft_actor:             # policy-gradient actor over soft mixture weights
+    hidden: 64
+    epochs: 500
+    lr: 0.01
+    n_clusters: 16
+    gamma: 10.0
+    reward_cost_weight: 0.0
+  grpo:                   # Group Relative Policy Optimization (arms = the group)
+    hidden: 64
+    epochs: 250
+    ppo_epochs: 4         # inner clipped-surrogate updates per refreshed old-policy
+    lr: 0.01
+    clip_eps: 0.2         # PPO clip epsilon
+    kl_coef: 0.01         # KL penalty toward the frozen reference policy
+    n_clusters: 16
+    gamma: 10.0
+    reward_cost_weight: 0.0    # lambda: >0 trades accuracy for cheaper experts
+  fugu:                   # Sakana Fugu: soft reward labels + SVF selector + sep-CMA-ES
+    n_clusters: 24
+    gamma: 10.0
+    temperature: 0.20
+    epochs: 350
+    patience: 60
+    lr: 0.01
+    weight_decay: 0.001
+    evo_generations: 20
+    evo_population: 12
+    evo_sigma: 0.025
+    reward_cost_weight: 0.0
+  fugu_ultra:             # Sakana Fugu Ultra: dynamic workflows + sampled GRPO, no KL
+    hidden: 96
+    n_clusters: 24
+    gamma: 10.0
+    min_steps: 2
+    max_steps: 5
+    group_size: 6
+    sft_temperature: 0.20
+    sft_epochs: 120
+    sft_lr: 0.01
+    epochs: 100
+    ppo_epochs: 4
+    lr: 0.005
+    clip_eps: 0.2
+    entropy_coef: 0.01
+    reward_cost_weight: 0.0
+
+paths:
+  results_dir: results   # relative to this file
+  cache_dir: cache

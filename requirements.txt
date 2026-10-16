@@ -1,0 +1,12 @@
+# Everything the paper's tables and figures need. Python 3.10+.
+numpy>=1.24
+pandas>=2.0
+scipy>=1.10
+scikit-learn>=1.3
+pyyaml>=6.0
+matplotlib>=3.7
+# Only scripts/skillaggregation_mc.py imports these. It rebuilds its table from
+# the committed per-epoch predictions without training; --retrain fine-tunes
+# GPT-2 and needs a GPU.
+torch>=2.2
+transformers>=4.44

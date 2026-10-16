@@ -1,0 +1,11 @@
+\begin{tabular}{lrrrrr}
+\toprule
+Reachable set & All & MMLU & GSM8K & ARC-C & HellaSwag \\
+\midrule
+Weighted vote, greedy answers & 94.2 & 94.2 & 89.2 & 96.2 & 93.3 \\
+Weighted vote, sampled modes & 95.6 & 95.0 & 92.5 & 97.0 & 95.2 \\
+Distribution fusion, $\exists\,w \ge 0$ & 95.8 & 96.7 & 91.7 & 96.8 & 95.3 \\
+Distribution fusion, $\exists\,w$ signed & 99.7 & 100.0 & 95.8 & 100.0 & 100.0 \\
+Upper bound: gold sampled at all & 99.7 & 100.0 & 96.7 & 100.0 & 100.0 \\
+\bottomrule
+\end{tabular}

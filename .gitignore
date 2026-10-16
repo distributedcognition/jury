@@ -1,0 +1,6 @@
+# Outputs of the scripts; the reference copies live in reference/.
+/tables/
+/figures/
+__pycache__/
+/.venv/
+.DS_Store

@@ -1,0 +1,19 @@
+\begin{tabular}{lrrrrrr}
+\toprule
+Expert & Params (B) & All & MMLU & GSM8K & ARC-C & HellaSwag \\
+\midrule
+\texttt{qwen3b} & 3.00 & \textbf{75.0} & 71.2 & 57.5 & 80.8 & 74.2 \\
+\texttt{granite2b} & 2.50 & 66.6 & 64.6 & 69.2 & 68.0 & 65.5 \\
+\texttt{qwen1.5b} & 1.50 & 66.5 & 67.1 & 40.0 & 75.2 & 63.0 \\
+\texttt{qwen-coder1.5b} & 1.50 & 52.3 & 56.2 & 26.7 & 61.3 & 46.8 \\
+\texttt{qwen3-0.6b} & 0.75 & 45.4 & 45.4 & 53.3 & 48.5 & 40.7 \\
+\texttt{olmo2-1b} & 1.50 & 41.0 & 47.1 & 74.2 & 42.0 & 31.0 \\
+\texttt{qwen0.5b} & 0.50 & 32.4 & 37.5 & 39.2 & 32.8 & 28.5 \\
+\texttt{qwen-math} & 1.50 & 28.9 & 28.7 & 52.5 & 26.2 & 27.0 \\
+\texttt{eurollm1.7b} & 1.70 & 24.4 & 22.9 & 10.8 & 25.7 & 26.5 \\
+\midrule
+Random expert & 1.61 & 48.1 & 49.0 & 47.0 & 51.2 & 44.8 \\
+Best expert per source & -- & 76.3 & -- & -- & -- & -- \\
+Oracle (best per question) & -- & 94.2 & 94.2 & 89.2 & 96.2 & 93.3 \\
+\bottomrule
+\end{tabular}
