@@ -235,15 +235,3 @@ results/                   the shipped outputs of the long analyses, reused by t
 reference/tables/          the paper's tables, for `make check`
 tables/, figures/          written by the scripts
 ```
-
-## Use of generative AI
-
-Supporting the implementation of the code for the evaluation, we used Claude
-Opus 5 (Anthropic). Every method, protocol and number was specified, checked
-and run by the authors.
-
-## What is not here
-
-The models themselves and the code that ran them to build the cache, neither
-of which enters the paper's tables. Figure 1 is a hand-drawn
-diagram.
